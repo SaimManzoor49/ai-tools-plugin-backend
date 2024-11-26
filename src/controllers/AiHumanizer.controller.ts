@@ -6,7 +6,7 @@ import OpenAI from "openai";
 
 export const AiHumanizer = asyncHandler(async (req:Request, res:Response) => {
     const {text,tone} = req.body
-    if(text?.trim()?.length>8){
+    if(text?.trim()?.length<8){
          res.status(400).json({ response: 'Input text is not correct or too short.' })
     }
     const openai = new OpenAI({apiKey:process.env.OPENAI_API_KEY});
