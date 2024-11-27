@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.changeApiKey = void 0;
+exports.testKey = exports.changeApiKey = void 0;
 const express_async_handler_1 = __importDefault(require("express-async-handler"));
 const sqlite3_1 = __importDefault(require("sqlite3"));
 const path_1 = __importDefault(require("path"));
@@ -61,6 +61,24 @@ exports.changeApiKey = (0, express_async_handler_1.default)(async (req, res) => 
         console.error("Error updating key:", error);
         res.status(500).json({ response: "Failed to update the key." });
     }
+});
+exports.testKey = (0, express_async_handler_1.default)(async (req, res) => {
+    const { apiKey } = req.body;
+    const openai = new openai_1.OpenAI({ apiKey });
+    const completion = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [
+            {
+                role: "system",
+                content: "you are a helper and only response with ok not even a single char other then that",
+            },
+            {
+                role: "user",
+                content: 'test',
+            },
+        ],
+    });
+    res.status(200).json({ response: completion.choices[0].message.content });
 });
 // Function to reinitialize the OpenAI client
 function reinitializeOpenAI(apiKey) {

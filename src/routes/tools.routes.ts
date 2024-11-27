@@ -2,12 +2,14 @@ import express from "express";
 import {AiExtendEssay} from '../controllers/AiExtendEssay.controller'
 import {AiHumanizer} from '../controllers/AiHumanizer.controller'
 import {changeApiKey} from '../controllers/changeApiKey.controller'
+import {testKey} from '../controllers/changeApiKey.controller'
 import {AddToolToDb} from '../controllers/AddToolToDB.controller'
 import {GetAiTools} from '../controllers/GetAiTools.controller'
 
 const router = express.Router();
 
 router.route("/changeKey").post(changeApiKey);
+router.route("/testKey").post(testKey);
 router.route("/essay-extender").post(AiExtendEssay);
 router.route("/humanizer").post(AiHumanizer);
 router.route("/AddToolToDb").post(AddToolToDb);

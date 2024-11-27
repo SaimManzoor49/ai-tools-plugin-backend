@@ -66,6 +66,27 @@ export const changeApiKey = asyncHandler(async (req: Request, res: Response) => 
     }
 });
 
+
+export const testKey = asyncHandler(async (req, res) => {
+    const {apiKey} = req.body
+    const openai = new OpenAI({ apiKey });
+    const completion = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [
+          {
+            role: "system",
+            content: "you are a helper and only response with ok not even a single char other then that",
+          },
+          {
+            role: "user",
+            content: 'test',
+          },
+        ],
+      });
+      res.status(200).json({ response: completion.choices[0].message.content });
+});
+
+
 // Function to reinitialize the OpenAI client
 function reinitializeOpenAI(apiKey: string) {
     try {
