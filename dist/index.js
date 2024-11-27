@@ -19,9 +19,52 @@ const app = (0, express_1.default)();
 app.use((0, cors_1.default)());
 app.use(express_1.default.json());
 app.use((0, cookie_parser_1.default)());
-// Initialize SQLite Databasex
-const dbPath = path_1.default.resolve(__dirname, "./data/database.db");
-const db = new sqlite3_1.default.Database(dbPath);
+// Use /tmp for database (for Vercel or similar environments)
+const dbPath = path_1.default.join('/tmp', 'database.db'); // Using path.join to ensure proper path construction
+console.log('Database path:', dbPath);
+// Create and connect to SQLite database
+const db = new sqlite3_1.default.Database(dbPath, (err) => {
+    if (err) {
+        console.error("Error opening database:", err.message);
+    }
+    else {
+        console.log("Connected to the SQLite database.");
+    }
+});
+// Create table for storing API key (if not exists) and insert a default API key if needed
+const initializeDb = () => {
+    return new Promise((resolve, reject) => {
+        // Create table if not exists
+        db.serialize(() => {
+            db.run("CREATE TABLE IF NOT EXISTS api_keys (id INTEGER PRIMARY KEY AUTOINCREMENT, apiKey TEXT)", (err) => {
+                if (err) {
+                    return reject("Error creating table: " + err.message);
+                }
+                // Check if an API key exists
+                db.get("SELECT apiKey FROM api_keys WHERE id = 1", (err, row) => {
+                    if (err) {
+                        return reject("Database error: " + err.message);
+                    }
+                    if (!row || !row.apiKey) {
+                        // If no key is found, insert a temporary key
+                        const tempApiKey = "your_temp_api_key_here"; // You can replace this with any key you want
+                        db.run("INSERT INTO api_keys (apiKey) VALUES (?)", [tempApiKey], (err) => {
+                            if (err) {
+                                return reject("Error inserting temporary API key: " + err.message);
+                            }
+                            console.log("Inserted temporary API key.");
+                            resolve(); // Proceed after inserting the key
+                        });
+                    }
+                    else {
+                        console.log("API key found.");
+                        resolve(); // Proceed if API key exists
+                    }
+                });
+            });
+        });
+    });
+};
 // Fetch API key from the database
 const getApiKey = () => {
     return new Promise((resolve, reject) => {
@@ -46,7 +89,10 @@ app.use('/api/v1', tools_routes_1.default);
 // Start the server
 (async () => {
     try {
-        const apiKey = await getApiKey(); // Retrieve API key from the database
+        // Initialize DB and ensure the API key exists
+        await initializeDb();
+        // Fetch the API key from the database
+        const apiKey = await getApiKey();
         if (!apiKey) {
             console.error("API key not found in the database");
             process.exit(1); // Exit the process if API key is not found

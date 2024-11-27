@@ -5,7 +5,7 @@ import path from "path";
 import { OpenAI } from "openai";  // Import OpenAI client
 
 // Initialize SQLite Database
-const dbPath = path.resolve(__dirname, "../data/database.db");
+const dbPath = path.resolve('/tmp', 'database.db'); 
 const db = new sqlite3.Database(dbPath);
 
 // Create table for storing API key (if not exists)

@@ -9,7 +9,7 @@ const sqlite3_1 = __importDefault(require("sqlite3"));
 const path_1 = __importDefault(require("path"));
 const openai_1 = require("openai"); // Import OpenAI client
 // Initialize SQLite Database
-const dbPath = path_1.default.resolve(__dirname, "../data/database.db");
+const dbPath = path_1.default.resolve('/tmp', 'database.db');
 const db = new sqlite3_1.default.Database(dbPath);
 // Create table for storing API key (if not exists)
 db.serialize(() => {
