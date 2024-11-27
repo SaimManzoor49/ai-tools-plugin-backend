@@ -34,26 +34,56 @@ exports.AddToolToDb = (0, express_async_handler_1.default)(async (req, res) => {
             return res.status(500).send({ error: 'Error creating AI Tools table.' });
         }
         console.log('AI Tools table created (or already exists).');
-        // After the table is created or already exists, insert the new tool
         const { name, prompt } = req.body; // Get the tool name and prompt from the request body
         if (!name || !prompt) {
             return res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).send({ error: 'Tool name and prompt are required.' });
         }
-        const insertToolSQL = `
-      INSERT INTO ai_tools (name, prompt) 
-      VALUES (?, ?);
+        // Check if the tool already exists
+        const checkToolExistsSQL = `
+      SELECT id FROM ai_tools WHERE name = ?;
     `;
-        // Insert the new tool into the table
-        db.run(insertToolSQL, [name, prompt], function (err) {
+        db.get(checkToolExistsSQL, [name], function (err, row) {
             if (err) {
-                console.error('Error inserting tool:', err.message);
-                return res.status(500).send({ error: 'Failed to insert tool into the database.' });
+                console.error('Error checking tool existence:', err.message);
+                return res.status(500).send({ error: 'Error checking if tool exists.' });
             }
-            console.log('New AI Tool inserted with ID:', this.lastID);
-            res.status(http_status_codes_1.StatusCodes.CREATED).send({
-                message: 'New tool added successfully.',
-                toolId: this.lastID, // Return the ID of the newly inserted tool
-            });
+            if (row) {
+                // Tool already exists, update the prompt
+                const updateToolSQL = `
+          UPDATE ai_tools
+          SET prompt = ?, updated_at = CURRENT_TIMESTAMP
+          WHERE name = ?;
+        `;
+                db.run(updateToolSQL, [prompt, name], function (err) {
+                    if (err) {
+                        console.error('Error updating tool:', err.message);
+                        return res.status(500).send({ error: 'Failed to update tool in the database.' });
+                    }
+                    console.log('Tool updated successfully');
+                    res.status(http_status_codes_1.StatusCodes.OK).send({
+                        message: 'Tool prompt updated successfully.',
+                        toolName: name, // Return the updated tool's name
+                    });
+                });
+            }
+            else {
+                // Tool does not exist, insert a new tool
+                const insertToolSQL = `
+          INSERT INTO ai_tools (name, prompt) 
+          VALUES (?, ?);
+        `;
+                db.run(insertToolSQL, [name, prompt], function (err) {
+                    if (err) {
+                        console.error('Error inserting tool:', err.message);
+                        return res.status(500).send({ error: 'Failed to insert tool into the database.' });
+                    }
+                    console.log('New AI Tool inserted with ID:', this.lastID);
+                    res.status(http_status_codes_1.StatusCodes.CREATED).send({
+                        message: 'New tool added successfully.',
+                        toolId: this.lastID, // Return the ID of the newly inserted tool
+                    });
+                });
+            }
         });
     });
     // Close the database connection after the operation is completed
