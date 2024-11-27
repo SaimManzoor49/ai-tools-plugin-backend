@@ -9,8 +9,8 @@ const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const dotenv_1 = require("dotenv");
 const tools_routes_1 = __importDefault(require("./routes/tools.routes"));
 const openai_1 = __importDefault(require("openai"));
-const sqlite3_1 = __importDefault(require("sqlite3"));
-const path_1 = __importDefault(require("path"));
+const index_1 = __importDefault(require("./db/index")); // Ensure this properly connects to MongoDB
+const apiKey_model_1 = __importDefault(require("./models/apiKey.model"));
 // Load environment variables
 (0, dotenv_1.config)();
 // Initialize the Express app
@@ -19,67 +19,33 @@ const app = (0, express_1.default)();
 app.use((0, cors_1.default)());
 app.use(express_1.default.json());
 app.use((0, cookie_parser_1.default)());
-// Use /tmp for database (for Vercel or similar environments)
-const dbPath = path_1.default.join('/tmp', 'database.db'); // Using path.join to ensure proper path construction
-console.log('Database path:', dbPath);
-// Create and connect to SQLite database
-const db = new sqlite3_1.default.Database(dbPath, (err) => {
-    if (err) {
-        console.error("Error opening database:", err.message);
+// Initialize the database
+const initializeDb = async () => {
+    try {
+        const existingKey = await apiKey_model_1.default.findOne();
+        if (!existingKey) {
+            // Insert a temporary key if none exists
+            const tempApiKey = "your_temp_api_key_here"; // Replace with a default or environment-based key
+            await apiKey_model_1.default.create({ apiKey: tempApiKey });
+            console.log("Inserted temporary API key.");
+        }
+        else {
+            console.log("API key found.");
+        }
     }
-    else {
-        console.log("Connected to the SQLite database.");
+    catch (error) {
+        throw new Error("Error initializing the database: " + error?.message);
     }
-});
-// Create table for storing API key (if not exists) and insert a default API key if needed
-const initializeDb = () => {
-    return new Promise((resolve, reject) => {
-        // Create table if not exists
-        db.serialize(() => {
-            db.run("CREATE TABLE IF NOT EXISTS api_keys (id INTEGER PRIMARY KEY AUTOINCREMENT, apiKey TEXT)", (err) => {
-                if (err) {
-                    return reject("Error creating table: " + err.message);
-                }
-                // Check if an API key exists
-                db.get("SELECT apiKey FROM api_keys WHERE id = 1", (err, row) => {
-                    if (err) {
-                        return reject("Database error: " + err.message);
-                    }
-                    if (!row || !row.apiKey) {
-                        // If no key is found, insert a temporary key
-                        const tempApiKey = "your_temp_api_key_here"; // You can replace this with any key you want
-                        db.run("INSERT INTO api_keys (apiKey) VALUES (?)", [tempApiKey], (err) => {
-                            if (err) {
-                                return reject("Error inserting temporary API key: " + err.message);
-                            }
-                            console.log("Inserted temporary API key.");
-                            resolve(); // Proceed after inserting the key
-                        });
-                    }
-                    else {
-                        console.log("API key found.");
-                        resolve(); // Proceed if API key exists
-                    }
-                });
-            });
-        });
-    });
 };
-// Fetch API key from the database
-const getApiKey = () => {
-    return new Promise((resolve, reject) => {
-        db.get("SELECT apiKey FROM api_keys WHERE id = 1", (err, row) => {
-            if (err) {
-                reject("Database error: " + err.message);
-            }
-            else if (row && row.apiKey) {
-                resolve(row.apiKey);
-            }
-            else {
-                resolve(null); // No key found
-            }
-        });
-    });
+// Fetch the API key from the database
+const getApiKey = async () => {
+    try {
+        const keyDoc = await apiKey_model_1.default.findOne();
+        return keyDoc ? keyDoc.apiKey : null;
+    }
+    catch (error) {
+        throw new Error("Error fetching the API key: " + error?.message);
+    }
 };
 // Routes
 app.get("/", (req, res) => {
@@ -89,9 +55,12 @@ app.use('/api/v1', tools_routes_1.default);
 // Start the server
 (async () => {
     try {
+        // Connect to MongoDB
+        await (0, index_1.default)();
+        console.log("Connected to MongoDB.");
         // Initialize DB and ensure the API key exists
         await initializeDb();
-        // Fetch the API key from the database
+        // Fetch the API key from MongoDB
         const apiKey = await getApiKey();
         if (!apiKey) {
             console.error("API key not found in the database");
@@ -107,11 +76,11 @@ app.use('/api/v1', tools_routes_1.default);
         });
     }
     catch (error) {
-        console.error("Error initializing OpenAI:", error);
+        console.error("Error initializing the server:", error);
         process.exit(1); // Exit the process in case of error
     }
     // Handle app-level errors
     app.on("error", (error) => {
-        console.error("App error:", error.message || "Unknown error");
+        console.error("App error:", error?.message || "Unknown error");
     });
 })();

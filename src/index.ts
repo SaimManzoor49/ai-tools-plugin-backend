@@ -4,8 +4,8 @@ import cookieParser from "cookie-parser";
 import { config } from "dotenv";
 import aiToolsRouter from './routes/tools.routes';
 import OpenAI from "openai";
-import sqlite3 from "sqlite3";
-import path from "path";
+import connectToDB from './db/index'; // Ensure this properly connects to MongoDB
+import ApiKey from "./models/apiKey.model";
 
 // Load environment variables
 config();
@@ -18,68 +18,33 @@ app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 
-// Use /tmp for database (for Vercel or similar environments)
-const dbPath = path.join('/tmp', 'database.db'); // Using path.join to ensure proper path construction
-console.log('Database path:', dbPath);
 
-// Create and connect to SQLite database
-const db = new sqlite3.Database(dbPath, (err) => {
-  if (err) {
-    console.error("Error opening database:", err.message);
-  } else {
-    console.log("Connected to the SQLite database.");
+
+// Initialize the database
+const initializeDb = async (): Promise<void> => {
+  try {
+    const existingKey = await ApiKey.findOne();
+    if (!existingKey) {
+      // Insert a temporary key if none exists
+      const tempApiKey = "your_temp_api_key_here"; // Replace with a default or environment-based key
+      await ApiKey.create({ apiKey: tempApiKey });
+      console.log("Inserted temporary API key.");
+    } else {
+      console.log("API key found.");
+    }
+  } catch (error:any) {
+    throw new Error("Error initializing the database: " + error?.message);
   }
-});
-
-// Create table for storing API key (if not exists) and insert a default API key if needed
-const initializeDb = (): Promise<void> => {
-  return new Promise((resolve, reject) => {
-    // Create table if not exists
-    db.serialize(() => {
-      db.run("CREATE TABLE IF NOT EXISTS api_keys (id INTEGER PRIMARY KEY AUTOINCREMENT, apiKey TEXT)", (err) => {
-        if (err) {
-          return reject("Error creating table: " + err.message);
-        }
-
-        // Check if an API key exists
-        db.get("SELECT apiKey FROM api_keys WHERE id = 1", (err, row:any) => {
-          if (err) {
-            return reject("Database error: " + err.message);
-          }
-
-          if (!row || !row.apiKey) {
-            // If no key is found, insert a temporary key
-            const tempApiKey = "your_temp_api_key_here"; // You can replace this with any key you want
-            db.run("INSERT INTO api_keys (apiKey) VALUES (?)", [tempApiKey], (err) => {
-              if (err) {
-                return reject("Error inserting temporary API key: " + err.message);
-              }
-              console.log("Inserted temporary API key.");
-              resolve(); // Proceed after inserting the key
-            });
-          } else {
-            console.log("API key found.");
-            resolve(); // Proceed if API key exists
-          }
-        });
-      });
-    });
-  });
 };
 
-// Fetch API key from the database
-const getApiKey = (): Promise<string | null> => {
-  return new Promise((resolve, reject) => {
-    db.get("SELECT apiKey FROM api_keys WHERE id = 1", (err, row:any) => {
-      if (err) {
-        reject("Database error: " + err.message);
-      } else if (row && row.apiKey) {
-        resolve(row.apiKey);
-      } else {
-        resolve(null); // No key found
-      }
-    });
-  });
+// Fetch the API key from the database
+const getApiKey = async (): Promise<string | null> => {
+  try {
+    const keyDoc = await ApiKey.findOne();
+    return keyDoc ? keyDoc.apiKey : null;
+  } catch (error:any) {
+    throw new Error("Error fetching the API key: " + error?.message);
+  }
 };
 
 // Routes
@@ -91,11 +56,15 @@ app.use('/api/v1', aiToolsRouter);
 // Start the server
 (async () => {
   try {
+    // Connect to MongoDB
+    await connectToDB();
+    console.log("Connected to MongoDB.");
+
     // Initialize DB and ensure the API key exists
     await initializeDb();
 
-    // Fetch the API key from the database
-    const apiKey = await getApiKey(); 
+    // Fetch the API key from MongoDB
+    const apiKey = await getApiKey();
     if (!apiKey) {
       console.error("API key not found in the database");
       process.exit(1); // Exit the process if API key is not found
@@ -111,13 +80,13 @@ app.use('/api/v1', aiToolsRouter);
     app.listen(process.env.PORT || 8081, () => {
       console.log("App is listening on: " + (process.env.PORT || 8081));
     });
-  } catch (error) {
-    console.error("Error initializing OpenAI:", error);
+  } catch (error:any) {
+    console.error("Error initializing the server:", error);
     process.exit(1); // Exit the process in case of error
   }
 
   // Handle app-level errors
   app.on("error", (error: any) => {
-    console.error("App error:", error.message || "Unknown error");
+    console.error("App error:", error?.message || "Unknown error");
   });
 })();
