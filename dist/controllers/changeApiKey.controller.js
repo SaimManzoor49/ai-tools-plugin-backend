@@ -9,37 +9,39 @@ const openai_1 = require("openai"); // Import OpenAI client
 const apiKey_model_1 = __importDefault(require("../models/apiKey.model"));
 // Handler to change the API key
 exports.changeApiKey = (0, express_async_handler_1.default)(async (req, res) => {
-    const { apiKey } = req.body;
-    // Validate the API key
-    if (!apiKey?.trim() || apiKey.trim().length < 8) {
-        res.status(400).json({ response: "Please provide a valid key." });
+    const { apiKey, siteUrl } = req.body;
+    // Validate inputs
+    if (!siteUrl?.trim() || !apiKey?.trim() || apiKey.trim().length < 8) {
+        res.status(400).json({ response: "Please provide a valid site URL and API key." });
         return;
     }
+    console.log(siteUrl);
     try {
-        // Check if an API key exists
-        const existingKey = await apiKey_model_1.default.findOne();
+        // Check if an API key already exists for the given siteUrl
+        const existingKey = await apiKey_model_1.default.findOne({ siteUrl });
         if (existingKey) {
             // Update the existing API key
             existingKey.apiKey = apiKey;
             await existingKey.save();
             // Reinitialize OpenAI with the new key
             reinitializeOpenAI(apiKey);
-            res.status(200).json({ response: "Key updated successfully." });
+            res.status(200).json({ response: "API key updated successfully for the site." });
             return;
         }
         else {
-            // Insert a new API key
-            const newKey = new apiKey_model_1.default({ apiKey });
+            // Save a new API key for the site
+            const newKey = new apiKey_model_1.default({ siteUrl, apiKey });
             await newKey.save();
             // Reinitialize OpenAI with the new key
             reinitializeOpenAI(apiKey);
-            res.status(200).json({ response: "Key saved successfully." });
+            res.status(200).json({ response: "API key saved successfully for the site." });
             return;
         }
     }
     catch (error) {
         console.error("Error updating API key:", error);
-        res.status(500).json({ response: "Failed to update the key." });
+        res.status(500).json({ response: "Failed to update the API key." });
+        return;
     }
 });
 // Handler to test the API key with OpenAI

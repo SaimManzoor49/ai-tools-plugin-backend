@@ -3,11 +3,13 @@ import asyncHandler from "express-async-handler";
 import { StatusCodes } from "http-status-codes";
 import mongoose from "mongoose";
 import AiTool from "../models/aiTools.model";
+import OpenAI from "openai";
+import { getApiKeyBySiteUrl } from "../utils/getApiKey";
 
 
 // Handler to process text using the selected AI tool
 export const AiHumanizer = asyncHandler(async (req: Request, res: Response) => {
-  const { text, tone, name } = req.body;
+  const { text, tone, name,siteUrl } = req.body;
 
   // Validate input
   if (!name || name.trim().length === 0) {
@@ -20,6 +22,11 @@ export const AiHumanizer = asyncHandler(async (req: Request, res: Response) => {
      return
   }
 
+  if (siteUrl?.trim()?.length < 4) {
+     res.status(StatusCodes.BAD_REQUEST).json({ error: "Site URL is required." });
+     return
+  }
+console.log(siteUrl)
   try {
     // Query MongoDB to find the AI tool by name
     const tool = await AiTool.findOne({ name });
@@ -33,9 +40,10 @@ export const AiHumanizer = asyncHandler(async (req: Request, res: Response) => {
 
     // Inject the tone into the prompt
     prompt = prompt.replace('${tone}', tone);
-
+    const apiKey =await getApiKeyBySiteUrl(siteUrl)
+    const openai = new OpenAI({apiKey:apiKey})
     // Use OpenAI with the retrieved prompt
-    const completion = await (global as any).openai.chat.completions.create({
+    const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
         {
