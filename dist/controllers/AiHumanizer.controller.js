@@ -9,7 +9,7 @@ const http_status_codes_1 = require("http-status-codes");
 const aiTools_model_1 = __importDefault(require("../models/aiTools.model"));
 const openai_1 = __importDefault(require("openai"));
 const getApiKey_1 = require("../utils/getApiKey");
-// Handler to process text using the selected AI tool
+// Handler to process text using the selected AI tool with streaming
 exports.AiHumanizer = (0, express_async_handler_1.default)(async (req, res) => {
     const { text, tone, name, siteUrl } = req.body;
     // Validate input
@@ -25,7 +25,6 @@ exports.AiHumanizer = (0, express_async_handler_1.default)(async (req, res) => {
         res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({ error: "Site URL is required." });
         return;
     }
-    console.log(siteUrl);
     try {
         // Query MongoDB to find the AI tool by name
         const tool = await aiTools_model_1.default.findOne({ name });
@@ -35,11 +34,15 @@ exports.AiHumanizer = (0, express_async_handler_1.default)(async (req, res) => {
         }
         let prompt = tool.prompt; // Extract the prompt from the database
         // Inject the tone into the prompt
-        prompt = prompt.replace('${tone}', tone);
+        prompt = prompt.replace("${tone}", tone);
         const apiKey = await (0, getApiKey_1.getApiKeyBySiteUrl)(siteUrl);
         const openai = new openai_1.default({ apiKey: apiKey });
-        // Use OpenAI with the retrieved prompt
-        const completion = await openai.chat.completions.create({
+        // Set headers for a streamed response
+        res.setHeader("Content-Type", "text/event-stream");
+        res.setHeader("Cache-Control", "no-cache");
+        res.setHeader("Connection", "keep-alive");
+        // Use OpenAI's API with streaming enabled
+        const stream = await openai.chat.completions.create({
             model: "gpt-4o-mini",
             messages: [
                 {
@@ -51,13 +54,21 @@ exports.AiHumanizer = (0, express_async_handler_1.default)(async (req, res) => {
                     content: text,
                 },
             ],
+            stream: true,
         });
-        res.status(200).json({ response: completion.choices[0].message.content });
-        return;
+        // Stream response data to the client
+        for await (const chunk of stream) {
+            const content = chunk.choices[0]?.delta?.content;
+            if (content) {
+                res.write(`${content}`); // Write data to the response
+            }
+        }
+        // End the stream
+        res.write("data: [DONE]\n\n");
+        res.end();
     }
     catch (error) {
         console.error("Error processing AI humanizer request:", error);
         res.status(500).json({ error: "Failed to process the request with OpenAI." });
-        return;
     }
 });
