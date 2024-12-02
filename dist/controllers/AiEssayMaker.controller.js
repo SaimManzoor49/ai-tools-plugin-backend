@@ -3,15 +3,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AiResearchPaperMaker = void 0;
+exports.AiEssayMaker = void 0;
 const express_async_handler_1 = __importDefault(require("express-async-handler"));
 const http_status_codes_1 = require("http-status-codes");
 const aiTools_model_1 = __importDefault(require("../models/aiTools.model"));
 const openai_1 = __importDefault(require("openai"));
 const getApiKey_1 = require("../utils/getApiKey");
 // Handler to process text using the selected AI tool with streaming
-exports.AiResearchPaperMaker = (0, express_async_handler_1.default)(async (req, res) => {
-    const { researchPaperTopic, wordCountLimit, citationStyle, additionalInstructions = 'no additional instructions', name, siteUrl } = req.body;
+exports.AiEssayMaker = (0, express_async_handler_1.default)(async (req, res) => {
+    const { essayTopic, wordCount, essayType, additionalInstructions = 'no additional instructions', name, siteUrl } = req.body;
     // Validate input
     if (!name || name.trim().length === 0) {
         res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({ error: "Tool name is required." });
@@ -21,16 +21,16 @@ exports.AiResearchPaperMaker = (0, express_async_handler_1.default)(async (req, 
         res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({ error: "Site URL is required." });
         return;
     }
-    if (!wordCountLimit && wordCountLimit <= 0) {
+    if (!wordCount && wordCount <= 0) {
         res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({ error: "Please specify the word limit." });
         return;
     }
-    if (!researchPaperTopic?.trim().length) {
-        res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({ error: "Please specify the topic for your research paper." });
+    if (!essayTopic?.trim().length) {
+        res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({ error: "Please specify the topic for your essay." });
         return;
     }
-    if (!citationStyle?.trim().length) {
-        res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({ error: "Please specify the citation style to follow." });
+    if (!essayType?.trim().length) {
+        res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({ error: "Please specify the type for your essay." });
         return;
     }
     try {
@@ -42,7 +42,7 @@ exports.AiResearchPaperMaker = (0, express_async_handler_1.default)(async (req, 
         }
         let prompt = tool.prompt; // Extract the prompt from the database
         const dynamicVariables = {
-            researchPaperTopic, wordCountLimit, citationStyle, additionalInstructions
+            essayTopic, essayType, wordCount, additionalInstructions
         };
         // Replace all variables dynamically
         for (let [key, value] of Object.entries(dynamicVariables)) {
@@ -60,7 +60,7 @@ exports.AiResearchPaperMaker = (0, express_async_handler_1.default)(async (req, 
             messages: [
                 {
                     role: "system",
-                    content: `You are an advanced AI designed to assist with generating high-quality research papers. Follow the user's instructions carefully and ensure the content is well-organized, coherent, and relevant to the specified topic. Apply the appropriate citation style and ensure that the paper meets the word count limit. If any additional instructions are provided, incorporate them seamlessly into the paper.`,
+                    content: `You are an advanced AI designed to write high-quality essays. Follow the user's instructions carefully to ensure the essay is well-structured, coherent, and aligned with the specified topic, type, and word count. If additional instructions are provided, such as tone, formatting, or specific points, incorporate them seamlessly into the essay. Always ensure the essay meets the requirements while maintaining clarity and relevance.`,
                 },
                 {
                     role: "user",
