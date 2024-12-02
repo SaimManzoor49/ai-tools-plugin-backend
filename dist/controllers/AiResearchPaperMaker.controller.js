@@ -3,38 +3,34 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AiEssayExtender = void 0;
+exports.AiResearchPaperMaker = void 0;
 const express_async_handler_1 = __importDefault(require("express-async-handler"));
 const http_status_codes_1 = require("http-status-codes");
 const aiTools_model_1 = __importDefault(require("../models/aiTools.model"));
 const openai_1 = __importDefault(require("openai"));
 const getApiKey_1 = require("../utils/getApiKey");
 // Handler to process text using the selected AI tool with streaming
-exports.AiEssayExtender = (0, express_async_handler_1.default)(async (req, res) => {
-    const { text, wordCountIncrease, increaseType, expandingFactor, name, siteUrl } = req.body;
+exports.AiResearchPaperMaker = (0, express_async_handler_1.default)(async (req, res) => {
+    const { researchPaperTopic, wordCountLimit, citationStyle, additionalInstructions = 'no additional instructions', name, siteUrl } = req.body;
     // Validate input
     if (!name || name.trim().length === 0) {
         res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({ error: "Tool name is required." });
-        return;
-    }
-    if (text?.trim()?.length < 8) {
-        res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({ error: "Input text is too short or incorrect." });
         return;
     }
     if (siteUrl?.trim()?.length < 4) {
         res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({ error: "Site URL is required." });
         return;
     }
-    if (!wordCountIncrease && wordCountIncrease <= 0) {
+    if (!wordCountLimit && wordCountLimit <= 0) {
         res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({ error: "Please specify correctly how much you want to expand essay." });
         return;
     }
-    if (!increaseType?.trim().length) {
-        res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({ error: "Please specify by which way you want to increase your essay." });
+    if (!researchPaperTopic?.trim().length) {
+        res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({ error: "Please specify the topic for your research paper." });
         return;
     }
-    if (!expandingFactor?.trim().length) {
-        res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({ error: "Please specify how would you like to expand your essay by examples or explaination." });
+    if (!citationStyle?.trim().length) {
+        res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({ error: "Please specify the citation style to follow." });
         return;
     }
     try {
@@ -46,9 +42,7 @@ exports.AiEssayExtender = (0, express_async_handler_1.default)(async (req, res) 
         }
         let prompt = tool.prompt; // Extract the prompt from the database
         const dynamicVariables = {
-            wordCountIncrease,
-            increaseType,
-            expandingFactor
+            researchPaperTopic, wordCountLimit, citationStyle, additionalInstructions
         };
         // Replace all variables dynamically
         for (let [key, value] of Object.entries(dynamicVariables)) {
@@ -61,17 +55,16 @@ exports.AiEssayExtender = (0, express_async_handler_1.default)(async (req, res) 
         res.setHeader("Content-Type", "text/event-stream");
         res.setHeader("Cache-Control", "no-cache");
         res.setHeader("Connection", "keep-alive");
-        // Use OpenAI's API with streaming enabled
         const stream = await openai.chat.completions.create({
             model: "gpt-4o-mini",
             messages: [
                 {
                     role: "system",
-                    content: prompt,
+                    content: `You are an advanced AI designed to assist with generating high-quality research papers. Follow the user's instructions carefully and ensure the content is well-organized, coherent, and relevant to the specified topic. Apply the appropriate citation style and ensure that the paper meets the word count limit. If any additional instructions are provided, incorporate them seamlessly into the paper.`,
                 },
                 {
                     role: "user",
-                    content: text,
+                    content: prompt,
                 },
             ],
             stream: true,
@@ -88,7 +81,7 @@ exports.AiEssayExtender = (0, express_async_handler_1.default)(async (req, res) 
         res.end();
     }
     catch (error) {
-        console.error("Error processing AI essay extender request:", error);
+        console.error("Error processing AI Research Paper Maker request:", error);
         res.status(500).json({ error: error?.message || "Failed to process the request with OpenAI." });
     }
 });
