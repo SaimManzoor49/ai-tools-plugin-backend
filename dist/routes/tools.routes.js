@@ -12,6 +12,8 @@ const AiHumanizer_controller_1 = require("../controllers/AiHumanizer.controller"
 const AiEssayExtender_controller_1 = require("../controllers/AiEssayExtender.controller");
 const AiResearchPaperMaker_controller_1 = require("../controllers/AiResearchPaperMaker.controller");
 const AiEssayMaker_controller_1 = require("../controllers/AiEssayMaker.controller");
+const AiDiscussionResponseGenerator_controller_1 = require("../controllers/AiDiscussionResponseGenerator.controller");
+const AiEssayOutlineGenerator_controller_1 = require("../controllers/AiEssayOutlineGenerator.controller");
 const router = express_1.default.Router();
 router.route("/changeKey").post(changeApiKey_controller_1.changeApiKey);
 router.route("/testKey").post(changeApiKey_controller_2.testKey);
@@ -21,4 +23,6 @@ router.route("/humanizer").post(AiHumanizer_controller_1.AiHumanizer);
 router.route("/essayExtender").post(AiEssayExtender_controller_1.AiEssayExtender);
 router.route("/researchPaperMaker").post(AiResearchPaperMaker_controller_1.AiResearchPaperMaker);
 router.route("/essayMaker").post(AiEssayMaker_controller_1.AiEssayMaker);
+router.route("/discussionResponseGenerator").post(AiDiscussionResponseGenerator_controller_1.AiDiscussionResponseGenerator);
+router.route("/essayOutlineGenerator").post(AiEssayOutlineGenerator_controller_1.AiEssayOutlineGenerator);
 exports.default = router;

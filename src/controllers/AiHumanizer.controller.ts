@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 import AiTool from "../models/aiTools.model";
 import OpenAI from "openai";
 import { getApiKeyBySiteUrl } from "../utils/getApiKey";
+import {GPT_MODAL_NAME} from '../constants/index';
 
 // Handler to process text using the selected AI tool with streaming
 export const AiHumanizer = asyncHandler(async (req: Request, res: Response) => {
@@ -50,7 +51,7 @@ export const AiHumanizer = asyncHandler(async (req: Request, res: Response) => {
 
     // Use OpenAI's API with streaming enabled
     const stream = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: GPT_MODAL_NAME,
       messages: [
         {
           role: "system",

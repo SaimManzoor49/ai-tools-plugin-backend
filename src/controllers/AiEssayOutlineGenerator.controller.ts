@@ -7,8 +7,8 @@ import { getApiKeyBySiteUrl } from "../utils/getApiKey";
 import {GPT_MODAL_NAME} from '../constants/index';
 
 // Handler to process text using the selected AI tool with streaming
-export const AiEssayExtender = asyncHandler(async (req: Request, res: Response) => {
-  const { text, wordCountIncrease, increaseType, expandingFactor, name, siteUrl } = req.body;
+export const AiEssayOutlineGenerator = asyncHandler(async (req: Request, res: Response) => {
+  const { essayTopic, essayType,wordCount, additionalInstructions = 'no additional instructions', name, siteUrl } = req.body;
 
   // Validate input
   if (!name || name.trim().length === 0) {
@@ -16,26 +16,22 @@ export const AiEssayExtender = asyncHandler(async (req: Request, res: Response) 
     return;
   }
 
-  if (text?.trim()?.length < 8) {
-    res.status(StatusCodes.BAD_REQUEST).json({ error: "Input text is too short or incorrect." });
-    return;
-  }
 
   if (siteUrl?.trim()?.length < 4) {
     res.status(StatusCodes.BAD_REQUEST).json({ error: "Site URL is required." });
     return;
   }
-
-  if (!wordCountIncrease && wordCountIncrease <= 0) {
-    res.status(StatusCodes.BAD_REQUEST).json({ error: "Please specify correctly how much you want to expand essay." });
+  if (!essayTopic?.trim().length) {
+    res.status(StatusCodes.BAD_REQUEST).json({ error: "Please Specify the topic." });
     return;
   }
-  if (!increaseType?.trim().length) {
-    res.status(StatusCodes.BAD_REQUEST).json({ error: "Please specify by which way you want to increase your essay." });
+  if (!essayType?.trim().length) {
+    res.status(StatusCodes.BAD_REQUEST).json({ error: "Please specify the essay type." });
     return;
   }
-  if (!expandingFactor?.trim().length) {
-    res.status(StatusCodes.BAD_REQUEST).json({ error: "Please specify how would you like to expand your essay by examples or explaination." });
+  
+  if (!wordCount && wordCount <= 0) {
+    res.status(StatusCodes.BAD_REQUEST).json({ error: "Please specify the word limit." });
     return;
   }
 
@@ -51,11 +47,8 @@ export const AiEssayExtender = asyncHandler(async (req: Request, res: Response) 
     let prompt = tool.prompt; // Extract the prompt from the database
 
     const dynamicVariables = {
-      wordCountIncrease,
-      increaseType,
-      expandingFactor
+      essayTopic, essayType,wordCount, additionalInstructions
     };
-
 
     // Replace all variables dynamically
     for (let [key, value] of Object.entries(dynamicVariables)) {
@@ -71,17 +64,16 @@ export const AiEssayExtender = asyncHandler(async (req: Request, res: Response) 
     res.setHeader("Cache-Control", "no-cache");
     res.setHeader("Connection", "keep-alive");
 
-    // Use OpenAI's API with streaming enabled
     const stream = await openai.chat.completions.create({
       model: GPT_MODAL_NAME,
       messages: [
         {
           role: "system",
-          content: prompt,
+          content: 'You are an advanced AI designed to generate structured outlines for essays.',
         },
         {
           role: "user",
-          content: text,
+          content: prompt,
         },
       ],
       stream: true,
@@ -99,7 +91,7 @@ export const AiEssayExtender = asyncHandler(async (req: Request, res: Response) 
     res.write("data: [DONE]\n\n");
     res.end();
   } catch (error: any) {
-    console.error("Error processing AI essay extender request:", error);
+    console.error("Error processing AI Discussion Response Generator request:", error);
     res.status(500).json({ error: error?.message || "Failed to process the request with OpenAI." });
   }
 });

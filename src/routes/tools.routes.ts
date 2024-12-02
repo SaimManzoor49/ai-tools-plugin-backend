@@ -7,6 +7,8 @@ import {AiHumanizer} from '../controllers/AiHumanizer.controller'
 import {AiEssayExtender} from '../controllers/AiEssayExtender.controller'
 import {AiResearchPaperMaker} from '../controllers/AiResearchPaperMaker.controller'
 import {AiEssayMaker} from '../controllers/AiEssayMaker.controller'
+import {AiDiscussionResponseGenerator} from '../controllers/AiDiscussionResponseGenerator.controller'
+import {AiEssayOutlineGenerator} from '../controllers/AiEssayOutlineGenerator.controller'
 
 const router = express.Router();
 
@@ -18,5 +20,7 @@ router.route("/humanizer").post(AiHumanizer);
 router.route("/essayExtender").post(AiEssayExtender);
 router.route("/researchPaperMaker").post(AiResearchPaperMaker);
 router.route("/essayMaker").post(AiEssayMaker);
+router.route("/discussionResponseGenerator").post(AiDiscussionResponseGenerator);
+router.route("/essayOutlineGenerator").post(AiEssayOutlineGenerator);
 
 export default router;

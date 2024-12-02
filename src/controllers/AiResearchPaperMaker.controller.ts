@@ -4,6 +4,7 @@ import { StatusCodes } from "http-status-codes";
 import AiTool from "../models/aiTools.model";
 import OpenAI from "openai";
 import { getApiKeyBySiteUrl } from "../utils/getApiKey";
+import {GPT_MODAL_NAME} from '../constants/index';
 
 // Handler to process text using the selected AI tool with streaming
 export const AiResearchPaperMaker = asyncHandler(async (req: Request, res: Response) => {
@@ -64,7 +65,7 @@ export const AiResearchPaperMaker = asyncHandler(async (req: Request, res: Respo
     res.setHeader("Connection", "keep-alive");
 
     const stream = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: GPT_MODAL_NAME,
       messages: [
         {
           role: "system",

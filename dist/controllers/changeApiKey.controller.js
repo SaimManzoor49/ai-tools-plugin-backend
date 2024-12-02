@@ -7,6 +7,7 @@ exports.testKey = exports.changeApiKey = void 0;
 const express_async_handler_1 = __importDefault(require("express-async-handler"));
 const openai_1 = require("openai"); // Import OpenAI client
 const apiKey_model_1 = __importDefault(require("../models/apiKey.model"));
+const index_1 = require("../constants/index");
 // Handler to change the API key
 exports.changeApiKey = (0, express_async_handler_1.default)(async (req, res) => {
     const { apiKey, siteUrl } = req.body;
@@ -50,7 +51,7 @@ exports.testKey = (0, express_async_handler_1.default)(async (req, res) => {
     try {
         const openai = new openai_1.OpenAI({ apiKey });
         const completion = await openai.chat.completions.create({
-            model: "gpt-4o-mini",
+            model: index_1.GPT_MODAL_NAME,
             messages: [
                 {
                     role: "system",
