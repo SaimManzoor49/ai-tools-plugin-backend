@@ -16,7 +16,6 @@ exports.changeApiKey = (0, express_async_handler_1.default)(async (req, res) => 
         res.status(400).json({ response: "Please provide a valid site URL and API key." });
         return;
     }
-    console.log(siteUrl);
     try {
         // Check if an API key already exists for the given siteUrl
         const existingKey = await apiKey_model_1.default.findOne({ siteUrl });

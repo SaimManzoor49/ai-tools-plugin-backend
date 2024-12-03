@@ -16,6 +16,11 @@ const AiDiscussionResponseGenerator_controller_1 = require("../controllers/AiDis
 const AiEssayOutlineGenerator_controller_1 = require("../controllers/AiEssayOutlineGenerator.controller");
 const GetBannerUrl_controller_1 = require("../controllers/GetBannerUrl.controller");
 const SetBannerUrl_controller_1 = require("../controllers/SetBannerUrl.controller");
+const AiHookGenerator_controller_1 = require("../controllers/AiHookGenerator.controller");
+const AiEssayIntroductionGenerator_controller_1 = require("../controllers/AiEssayIntroductionGenerator.controller");
+const AiDebateCraft_controller_1 = require("../controllers/AiDebateCraft.controller");
+const AiResearchPaperOutlineGenerator_controller_1 = require("../controllers/AiResearchPaperOutlineGenerator.controller");
+const AiRhetoricalAnalysisGenerator_controller_1 = require("../controllers/AiRhetoricalAnalysisGenerator.controller");
 const router = express_1.default.Router();
 router.route("/getBannerUrl").get(GetBannerUrl_controller_1.GetBannerUrl);
 router.route("/setBannerUrl").post(SetBannerUrl_controller_1.SetBannerUrl);
@@ -29,4 +34,9 @@ router.route("/researchPaperMaker").post(AiResearchPaperMaker_controller_1.AiRes
 router.route("/essayMaker").post(AiEssayMaker_controller_1.AiEssayMaker);
 router.route("/discussionResponseGenerator").post(AiDiscussionResponseGenerator_controller_1.AiDiscussionResponseGenerator);
 router.route("/essayOutlineGenerator").post(AiEssayOutlineGenerator_controller_1.AiEssayOutlineGenerator);
+router.route("/hookGenerator").post(AiHookGenerator_controller_1.AiHookGenerator);
+router.route("/essayIntroductionGenerator").post(AiEssayIntroductionGenerator_controller_1.AiEssayIntroductionGenerator);
+router.route("/debateCraft").post(AiDebateCraft_controller_1.AiDebateCraft);
+router.route("/researchPaperOutlineGenerator").post(AiResearchPaperOutlineGenerator_controller_1.AiResearchPaperOutlineGenerator);
+router.route("/rhetoricalAnalysisGenerator").post(AiRhetoricalAnalysisGenerator_controller_1.AiRhetoricalAnalysisGenerator);
 exports.default = router;

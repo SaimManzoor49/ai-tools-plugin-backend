@@ -17,7 +17,6 @@ exports.SetBannerUrl = (0, express_async_handler_1.default)(async (req, res) => 
             });
         }
         const oldBanner = await banner_model_1.default.find();
-        console.log(oldBanner);
         if (oldBanner?.length) {
             await banner_model_1.default.findOneAndUpdate({ bannerUrl: oldBanner[0].bannerUrl }, { bannerUrl: bannerUrl });
         }

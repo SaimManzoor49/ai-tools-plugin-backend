@@ -14,7 +14,6 @@ export const changeApiKey = asyncHandler(async (req: Request, res: Response) => 
         res.status(400).json({ response: "Please provide a valid site URL and API key." });
         return
     }
-    console.log(siteUrl)
     try {
         // Check if an API key already exists for the given siteUrl
         const existingKey = await ApiKey.findOne({ siteUrl });

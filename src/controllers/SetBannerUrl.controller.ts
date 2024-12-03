@@ -14,7 +14,6 @@ export const SetBannerUrl = asyncHandler(async (req, res) => {
       });
     }
     const oldBanner = await Banner.find()
-    console.log(oldBanner)
     if (oldBanner?.length){
       await Banner.findOneAndUpdate({ bannerUrl: oldBanner[0].bannerUrl }, { bannerUrl: bannerUrl });
     }else{

@@ -11,6 +11,11 @@ import {AiDiscussionResponseGenerator} from '../controllers/AiDiscussionResponse
 import {AiEssayOutlineGenerator} from '../controllers/AiEssayOutlineGenerator.controller'
 import {GetBannerUrl} from '../controllers/GetBannerUrl.controller'
 import {SetBannerUrl} from '../controllers/SetBannerUrl.controller'
+import {AiHookGenerator} from '../controllers/AiHookGenerator.controller'
+import {AiEssayIntroductionGenerator} from '../controllers/AiEssayIntroductionGenerator.controller'
+import {AiDebateCraft} from '../controllers/AiDebateCraft.controller'
+import {AiResearchPaperOutlineGenerator} from '../controllers/AiResearchPaperOutlineGenerator.controller'
+import {AiRhetoricalAnalysisGenerator} from '../controllers/AiRhetoricalAnalysisGenerator.controller'
 
 const router = express.Router();
 
@@ -26,5 +31,10 @@ router.route("/researchPaperMaker").post(AiResearchPaperMaker);
 router.route("/essayMaker").post(AiEssayMaker);
 router.route("/discussionResponseGenerator").post(AiDiscussionResponseGenerator);
 router.route("/essayOutlineGenerator").post(AiEssayOutlineGenerator);
+router.route("/hookGenerator").post(AiHookGenerator);
+router.route("/essayIntroductionGenerator").post(AiEssayIntroductionGenerator);
+router.route("/debateCraft").post(AiDebateCraft);
+router.route("/researchPaperOutlineGenerator").post(AiResearchPaperOutlineGenerator);
+router.route("/rhetoricalAnalysisGenerator").post(AiRhetoricalAnalysisGenerator);
 
 export default router;
