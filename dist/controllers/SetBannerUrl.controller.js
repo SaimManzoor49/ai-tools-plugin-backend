@@ -16,8 +16,14 @@ exports.SetBannerUrl = (0, express_async_handler_1.default)(async (req, res) => 
                 message: "banner url is required",
             });
         }
-        // Fetch all tools from MongoDB
-        await banner_model_1.default.create({ bannerUrl: bannerUrl });
+        const oldBanner = await banner_model_1.default.find();
+        console.log(oldBanner);
+        if (oldBanner?.length) {
+            await banner_model_1.default.findOneAndUpdate({ bannerUrl: oldBanner[0].bannerUrl }, { bannerUrl: bannerUrl });
+        }
+        else {
+            await banner_model_1.default.create({ bannerUrl: bannerUrl });
+        }
         // Return the tools as JSON
         res.status(http_status_codes_1.StatusCodes.OK).send({
             message: "Banner url updated successfully.",
