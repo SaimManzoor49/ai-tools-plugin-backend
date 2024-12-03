@@ -9,9 +9,13 @@ import {AiResearchPaperMaker} from '../controllers/AiResearchPaperMaker.controll
 import {AiEssayMaker} from '../controllers/AiEssayMaker.controller'
 import {AiDiscussionResponseGenerator} from '../controllers/AiDiscussionResponseGenerator.controller'
 import {AiEssayOutlineGenerator} from '../controllers/AiEssayOutlineGenerator.controller'
+import {GetBannerUrl} from '../controllers/GetBannerUrl.controller'
+import {SetBannerUrl} from '../controllers/SetBannerUrl.controller'
 
 const router = express.Router();
 
+router.route("/getBannerUrl").get(GetBannerUrl);
+router.route("/setBannerUrl").post(SetBannerUrl);
 router.route("/changeKey").post(changeApiKey);
 router.route("/testKey").post(testKey);
 router.route("/GetAiTools").get(GetAiTools);

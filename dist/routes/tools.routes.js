@@ -14,7 +14,11 @@ const AiResearchPaperMaker_controller_1 = require("../controllers/AiResearchPape
 const AiEssayMaker_controller_1 = require("../controllers/AiEssayMaker.controller");
 const AiDiscussionResponseGenerator_controller_1 = require("../controllers/AiDiscussionResponseGenerator.controller");
 const AiEssayOutlineGenerator_controller_1 = require("../controllers/AiEssayOutlineGenerator.controller");
+const GetBannerUrl_controller_1 = require("../controllers/GetBannerUrl.controller");
+const SetBannerUrl_controller_1 = require("../controllers/SetBannerUrl.controller");
 const router = express_1.default.Router();
+router.route("/getBannerUrl").get(GetBannerUrl_controller_1.GetBannerUrl);
+router.route("/setBannerUrl").post(SetBannerUrl_controller_1.SetBannerUrl);
 router.route("/changeKey").post(changeApiKey_controller_1.changeApiKey);
 router.route("/testKey").post(changeApiKey_controller_2.testKey);
 router.route("/GetAiTools").get(GetAiTools_controller_1.GetAiTools);
