@@ -8,7 +8,7 @@ import {GPT_MODAL_NAME} from '../constants/index';
 
 // Handler to process text using the selected AI tool with streaming
 export const AiHookGenerator = asyncHandler(async (req: Request, res: Response) => {
-  const { topic, hookStyle, additionalInstructions = 'no additional instructions', name, siteUrl } = req.body;
+  const { topic, hookStyle,targetAudience,writingType, additionalInstructions = 'no additional instructions', name, siteUrl } = req.body;
 
   // Validate input
   if (!name || name.trim().length === 0) {
@@ -42,7 +42,7 @@ export const AiHookGenerator = asyncHandler(async (req: Request, res: Response) 
     let prompt = tool.prompt; // Extract the prompt from the database
 
     const dynamicVariables = {
-      topic, hookStyle, additionalInstructions
+      topic, hookStyle, targetAudience,writingType,additionalInstructions
     };
 
     // Replace all variables dynamically

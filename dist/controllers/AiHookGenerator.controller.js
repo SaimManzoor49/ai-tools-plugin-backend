@@ -12,7 +12,7 @@ const getApiKey_1 = require("../utils/getApiKey");
 const index_1 = require("../constants/index");
 // Handler to process text using the selected AI tool with streaming
 exports.AiHookGenerator = (0, express_async_handler_1.default)(async (req, res) => {
-    const { topic, hookStyle, additionalInstructions = 'no additional instructions', name, siteUrl } = req.body;
+    const { topic, hookStyle, targetAudience, writingType, additionalInstructions = 'no additional instructions', name, siteUrl } = req.body;
     // Validate input
     if (!name || name.trim().length === 0) {
         res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({ error: "Tool name is required." });
@@ -39,7 +39,7 @@ exports.AiHookGenerator = (0, express_async_handler_1.default)(async (req, res) 
         }
         let prompt = tool.prompt; // Extract the prompt from the database
         const dynamicVariables = {
-            topic, hookStyle, additionalInstructions
+            topic, hookStyle, targetAudience, writingType, additionalInstructions
         };
         // Replace all variables dynamically
         for (let [key, value] of Object.entries(dynamicVariables)) {
