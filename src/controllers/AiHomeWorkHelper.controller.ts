@@ -7,8 +7,8 @@ import { getApiKeyBySiteUrl } from "../utils/getApiKey";
 import {GPT_MODAL_NAME} from '../constants/index';
 
 // Handler to process text using the selected AI tool with streaming
-export const AiDiscussionResponseGenerator = asyncHandler(async (req: Request, res: Response) => {
-  const { text, agreeOrDisagree,tone, additionalInstructions = 'no additional instructions', name, siteUrl } = req.body;
+export const AiHomeWorkHelper = asyncHandler(async (req: Request, res: Response) => {
+  const { subject, academicLevel,topicOrQuestion, name, siteUrl } = req.body;
 
   // Validate input
   if (!name || name.trim().length === 0) {
@@ -21,12 +21,16 @@ export const AiDiscussionResponseGenerator = asyncHandler(async (req: Request, r
     res.status(StatusCodes.BAD_REQUEST).json({ error: "Site URL is required." });
     return;
   }
-  if (!text?.trim().length) {
-    res.status(StatusCodes.BAD_REQUEST).json({ error: "Please provide the topic or text for which you want to generate response." });
+  if (!subject?.trim().length) {
+    res.status(StatusCodes.BAD_REQUEST).json({ error: "Please provide the subject." });
     return;
   }
-  if (!agreeOrDisagree?.trim().length) {
-    res.status(StatusCodes.BAD_REQUEST).json({ error: "Please specify if you agree or disagree." });
+  if (!academicLevel?.trim().length) {
+    res.status(StatusCodes.BAD_REQUEST).json({ error: "Please specify you academic level." });
+    return;
+  }
+  if (!topicOrQuestion?.trim().length) {
+    res.status(StatusCodes.BAD_REQUEST).json({ error: "Please provide you topic or questions." });
     return;
   }
 
@@ -42,7 +46,7 @@ export const AiDiscussionResponseGenerator = asyncHandler(async (req: Request, r
     let prompt = tool.prompt; // Extract the prompt from the database
 
     const dynamicVariables = {
-      text, agreeOrDisagree, additionalInstructions,tone
+      subject, academicLevel,topicOrQuestion
     };
 
     // Replace all variables dynamically
@@ -68,12 +72,11 @@ export const AiDiscussionResponseGenerator = asyncHandler(async (req: Request, r
         },
         {
           role: "user",
-          content: text,
+          content: topicOrQuestion,
         },
       ],
       stream: true,
     });
-
     // Stream response data to the client
     for await (const chunk of stream) {
       const content = chunk.choices[0]?.delta?.content;
