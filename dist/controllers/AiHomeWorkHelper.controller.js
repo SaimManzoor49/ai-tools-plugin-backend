@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AiDiscussionResponseGenerator = void 0;
+exports.AiHomeWorkHelper = void 0;
 const express_async_handler_1 = __importDefault(require("express-async-handler"));
 const http_status_codes_1 = require("http-status-codes");
 const aiTools_model_1 = __importDefault(require("../models/aiTools.model"));
@@ -11,8 +11,8 @@ const openai_1 = __importDefault(require("openai"));
 const getApiKey_1 = require("../utils/getApiKey");
 const index_1 = require("../constants/index");
 // Handler to process text using the selected AI tool with streaming
-exports.AiDiscussionResponseGenerator = (0, express_async_handler_1.default)(async (req, res) => {
-    const { text, agreeOrDisagree, tone, additionalInstructions = 'no additional instructions', name, siteUrl } = req.body;
+exports.AiHomeWorkHelper = (0, express_async_handler_1.default)(async (req, res) => {
+    const { subject, academicLevel, topicOrQuestion, name, siteUrl } = req.body;
     // Validate input
     if (!name || name.trim().length === 0) {
         res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({ error: "Tool name is required." });
@@ -22,12 +22,16 @@ exports.AiDiscussionResponseGenerator = (0, express_async_handler_1.default)(asy
         res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({ error: "Site URL is required." });
         return;
     }
-    if (!text?.trim().length) {
-        res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({ error: "Please provide the topic or text for which you want to generate response." });
+    if (!subject?.trim().length) {
+        res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({ error: "Please provide the subject." });
         return;
     }
-    if (!agreeOrDisagree?.trim().length) {
-        res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({ error: "Please specify if you agree or disagree." });
+    if (!academicLevel?.trim().length) {
+        res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({ error: "Please specify you academic level." });
+        return;
+    }
+    if (!topicOrQuestion?.trim().length) {
+        res.status(http_status_codes_1.StatusCodes.BAD_REQUEST).json({ error: "Please provide you topic or questions." });
         return;
     }
     try {
@@ -39,7 +43,7 @@ exports.AiDiscussionResponseGenerator = (0, express_async_handler_1.default)(asy
         }
         let prompt = tool.prompt; // Extract the prompt from the database
         const dynamicVariables = {
-            text, agreeOrDisagree, additionalInstructions, tone
+            subject, academicLevel, topicOrQuestion
         };
         // Replace all variables dynamically
         for (let [key, value] of Object.entries(dynamicVariables)) {
@@ -61,7 +65,7 @@ exports.AiDiscussionResponseGenerator = (0, express_async_handler_1.default)(asy
                 },
                 {
                     role: "user",
-                    content: text,
+                    content: topicOrQuestion,
                 },
             ],
             stream: true,

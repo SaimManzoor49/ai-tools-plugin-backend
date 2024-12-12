@@ -21,6 +21,7 @@ const AiEssayIntroductionGenerator_controller_1 = require("../controllers/AiEssa
 const AiDebateCraft_controller_1 = require("../controllers/AiDebateCraft.controller");
 const AiResearchPaperOutlineGenerator_controller_1 = require("../controllers/AiResearchPaperOutlineGenerator.controller");
 const AiRhetoricalAnalysisGenerator_controller_1 = require("../controllers/AiRhetoricalAnalysisGenerator.controller");
+const AiHomeWorkHelper_controller_1 = require("../controllers/AiHomeWorkHelper.controller");
 const router = express_1.default.Router();
 router.route("/getBannerUrl").get(GetBannerUrl_controller_1.GetBannerUrl);
 router.route("/setBannerUrl").post(SetBannerUrl_controller_1.SetBannerUrl);
@@ -39,4 +40,5 @@ router.route("/essayIntroductionGenerator").post(AiEssayIntroductionGenerator_co
 router.route("/debateCraft").post(AiDebateCraft_controller_1.AiDebateCraft);
 router.route("/researchPaperOutlineGenerator").post(AiResearchPaperOutlineGenerator_controller_1.AiResearchPaperOutlineGenerator);
 router.route("/rhetoricalAnalysisGenerator").post(AiRhetoricalAnalysisGenerator_controller_1.AiRhetoricalAnalysisGenerator);
+router.route("/homeWorkHelper").post(AiHomeWorkHelper_controller_1.AiHomeWorkHelper);
 exports.default = router;
