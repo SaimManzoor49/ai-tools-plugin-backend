@@ -72,7 +72,7 @@ exports.AiEssayExtender = (0, express_async_handler_1.default)(async (req, res) 
                 },
                 {
                     role: "user",
-                    content: text,
+                    content: prompt + ' essay: ' + text,
                 },
             ],
             stream: true,

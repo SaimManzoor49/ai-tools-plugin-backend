@@ -81,12 +81,11 @@ export const AiEssayExtender = asyncHandler(async (req: Request, res: Response) 
         },
         {
           role: "user",
-          content: text,
+          content: prompt + ' essay: '+text,
         },
       ],
       stream: true,
     });
-
     // Stream response data to the client
     for await (const chunk of stream) {
       const content = chunk.choices[0]?.delta?.content;
