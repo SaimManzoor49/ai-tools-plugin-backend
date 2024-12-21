@@ -17,6 +17,7 @@ import {AiDebateCraft} from '../controllers/AiDebateCraft.controller'
 import {AiResearchPaperOutlineGenerator} from '../controllers/AiResearchPaperOutlineGenerator.controller'
 import {AiRhetoricalAnalysisGenerator} from '../controllers/AiRhetoricalAnalysisGenerator.controller'
 import {AiHomeWorkHelper} from '../controllers/AiHomeWorkHelper.controller'
+import { AiTopicsGenerator } from "../controllers/AiTopicsGenerator.controller";
 
 const router = express.Router();
 
@@ -38,5 +39,6 @@ router.route("/debateCraft").post(AiDebateCraft);
 router.route("/researchPaperOutlineGenerator").post(AiResearchPaperOutlineGenerator);
 router.route("/rhetoricalAnalysisGenerator").post(AiRhetoricalAnalysisGenerator);
 router.route("/homeWorkHelper").post(AiHomeWorkHelper);
+router.route("/topicsGenerator").post(AiTopicsGenerator);
 
 export default router;
