@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import asyncHandler from "express-async-handler";
 import { OpenAI } from "openai"; // Import OpenAI client
 import ApiKey from "../models/apiKey.model";
-import {GPT_MODAL_NAME} from '../constants/index';
 
 
 // Handler to change the API key
@@ -53,7 +52,7 @@ export const testKey = asyncHandler(async (req: Request, res: Response) => {
     try {
         const openai = new OpenAI({ apiKey });
         const completion = await openai.chat.completions.create({
-            model: GPT_MODAL_NAME,
+            model: 'gpt-4o-mini',
             messages: [
                 {
                     role: "system",

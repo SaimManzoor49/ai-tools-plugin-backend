@@ -30,6 +30,7 @@ router.route("/changeKey").post(changeApiKey_controller_1.changeApiKey);
 router.route("/testKey").post(changeApiKey_controller_2.testKey);
 router.route("/GetAiTools").get(GetAiTools_controller_1.GetAiTools);
 router.route("/AddToolToDb").post(AddToolToDB_controller_1.AddToolToDb);
+router.route("/updateToolModel").post(AddToolToDB_controller_1.updateToolModel);
 router.route("/humanizer").post(AiHumanizer_controller_1.AiHumanizer);
 router.route("/essayExtender").post(AiEssayExtender_controller_1.AiEssayExtender);
 router.route("/researchPaperMaker").post(AiResearchPaperMaker_controller_1.AiResearchPaperMaker);

@@ -9,7 +9,6 @@ const http_status_codes_1 = require("http-status-codes");
 const aiTools_model_1 = __importDefault(require("../models/aiTools.model"));
 const openai_1 = __importDefault(require("openai"));
 const getApiKey_1 = require("../utils/getApiKey");
-const index_1 = require("../constants/index");
 // Handler to process text using the selected AI tool with streaming
 exports.AiHumanizer = (0, express_async_handler_1.default)(async (req, res) => {
     const { text, tone, name, siteUrl } = req.body;
@@ -44,7 +43,7 @@ exports.AiHumanizer = (0, express_async_handler_1.default)(async (req, res) => {
         res.setHeader("Connection", "keep-alive");
         // Use OpenAI's API with streaming enabled
         const stream = await openai.chat.completions.create({
-            model: index_1.GPT_MODAL_NAME,
+            model: tool?.modelName,
             messages: [
                 {
                     role: "system",
