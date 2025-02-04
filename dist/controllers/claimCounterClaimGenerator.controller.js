@@ -3,14 +3,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.claimCounterClaimGenerator = void 0;
+exports.AiClaimCounterClaimGenerator = void 0;
 const express_async_handler_1 = __importDefault(require("express-async-handler"));
 const http_status_codes_1 = require("http-status-codes");
 const aiTools_model_1 = __importDefault(require("../models/aiTools.model"));
 const openai_1 = __importDefault(require("openai"));
 const getApiKey_1 = require("../utils/getApiKey");
 // Handler to process text using the selected AI tool with streaming
-exports.claimCounterClaimGenerator = (0, express_async_handler_1.default)(async (req, res) => {
+exports.AiClaimCounterClaimGenerator = (0, express_async_handler_1.default)(async (req, res) => {
     const { topic, claimOrCounterClaim, claimType, tone, additionalDetails = 'no additional instructions', name, siteUrl } = req.body;
     // Validate input
     if (!name || name.trim().length === 0) {
@@ -53,7 +53,6 @@ exports.claimCounterClaimGenerator = (0, express_async_handler_1.default)(async 
             const regex = new RegExp(`\\\${${key}}`, 'g');
             prompt = prompt.replace(regex, value);
         }
-        console.log(prompt, '0--------------00000000000000-------------------000000000000000');
         const apiKey = await (0, getApiKey_1.getApiKeyBySiteUrl)(siteUrl);
         const openai = new openai_1.default({ apiKey: apiKey });
         // Set headers for a streamed response
@@ -78,7 +77,6 @@ exports.claimCounterClaimGenerator = (0, express_async_handler_1.default)(async 
         for await (const chunk of stream) {
             const content = chunk.choices[0]?.delta?.content;
             if (content) {
-                console.log(content, '--');
                 res.write(`${content}`); // Write data to the response
             }
         }

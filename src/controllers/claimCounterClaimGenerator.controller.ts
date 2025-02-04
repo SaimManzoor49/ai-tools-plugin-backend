@@ -6,7 +6,7 @@ import OpenAI from "openai";
 import { getApiKeyBySiteUrl } from "../utils/getApiKey";
 
 // Handler to process text using the selected AI tool with streaming
-export const claimCounterClaimGenerator = asyncHandler(async (req: Request, res: Response) => {
+export const AiClaimCounterClaimGenerator = asyncHandler(async (req: Request, res: Response) => {
   const { topic, claimOrCounterClaim, claimType,tone, additionalDetails = 'no additional instructions', name, siteUrl } = req.body;
 
   // Validate input
@@ -58,7 +58,6 @@ export const claimCounterClaimGenerator = asyncHandler(async (req: Request, res:
       const regex = new RegExp(`\\\${${key}}`, 'g');  
       prompt = prompt.replace(regex, value);
     }
-console.log(prompt,'0--------------00000000000000-------------------000000000000000')
     const apiKey = await getApiKeyBySiteUrl(siteUrl);
     const openai = new OpenAI({ apiKey: apiKey });
 
@@ -85,7 +84,6 @@ console.log(prompt,'0--------------00000000000000-------------------000000000000
     for await (const chunk of stream) {
       const content = chunk.choices[0]?.delta?.content;
       if (content) {
-        console.log(content,'--')
         res.write(`${content}`); // Write data to the response
       }
     }
