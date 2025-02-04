@@ -124,12 +124,14 @@ export const AiArgumentCounterArgumentQuestionsGenerator = asyncHandler(
           },
         ],
         stream: true,
+        response_format:{ "type": "json_object" },
       });
 
       // Stream response data to the client
       for await (const chunk of stream) {
         const content = chunk.choices[0]?.delta?.content;
         if (content) {
+          console.log(content,'-0-0--0')
           res.write(`${content}`);
         }
       }
