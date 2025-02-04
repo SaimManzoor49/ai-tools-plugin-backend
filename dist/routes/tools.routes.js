@@ -23,6 +23,7 @@ const AiResearchPaperOutlineGenerator_controller_1 = require("../controllers/AiR
 const AiRhetoricalAnalysisGenerator_controller_1 = require("../controllers/AiRhetoricalAnalysisGenerator.controller");
 const AiHomeWorkHelper_controller_1 = require("../controllers/AiHomeWorkHelper.controller");
 const AiTopicsGenerator_controller_1 = require("../controllers/AiTopicsGenerator.controller");
+const claimCounterClaimGenerator_controller_1 = require("../controllers/claimCounterClaimGenerator.controller");
 const router = express_1.default.Router();
 router.route("/getBannerUrl").get(GetBannerUrl_controller_1.GetBannerUrl);
 router.route("/setBannerUrl").post(SetBannerUrl_controller_1.SetBannerUrl);
@@ -44,4 +45,5 @@ router.route("/researchPaperOutlineGenerator").post(AiResearchPaperOutlineGenera
 router.route("/rhetoricalAnalysisGenerator").post(AiRhetoricalAnalysisGenerator_controller_1.AiRhetoricalAnalysisGenerator);
 router.route("/homeWorkHelper").post(AiHomeWorkHelper_controller_1.AiHomeWorkHelper);
 router.route("/topicsGenerator").post(AiTopicsGenerator_controller_1.AiTopicsGenerator);
+router.route("/claimCounterClaimGenerator").post(claimCounterClaimGenerator_controller_1.claimCounterClaimGenerator);
 exports.default = router;
