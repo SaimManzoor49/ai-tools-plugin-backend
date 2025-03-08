@@ -7,7 +7,7 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const index_1 = require("../constants/index");
 const connectToDB = async () => {
     try {
-        const conn = await mongoose_1.default.connect(`mongodb+srv://saimmanzoor:Password@cluster0.tkv8u4s.mongodb.net/${index_1.DB_NAME}`);
+        const conn = await mongoose_1.default.connect(`mongodb+srv://saimmanzoor:Password@cluster0.tkv8u4s.mongodb.net/aitools`);
         console.log(`\n MongoDB connected to Host: ${conn.connection.host}`);
     }
     catch (error) {
