@@ -30,7 +30,7 @@ app.use('/api/v1', tools_routes_1.default);
         console.log("Connected to MongoDB.");
         // Start the server
         app.listen(process.env.PORT || 8081, () => {
-            console.log("App is listening on: " + (process.env.PORT || 8081));
+            console.log("App is listening on: " + (process.env.PORT || 8080));
         });
     }
     catch (error) {
